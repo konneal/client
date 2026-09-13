@@ -1,0 +1,41 @@
+{
+  "name": "@konneal/client",
+  "version": "0.1.0",
+  "description": "The Konneal publisher-site contract: engine API types, the SSE ask client, and the answer-contract renderers (citation chips, typed unit blocks, formulas, the in-context document pane)",
+  "license": "BSD-3-Clause",
+  "type": "module",
+  "repository": "github:konneal/client",
+  "exports": {
+    ".": "./src/index.ts",
+    "./vue": "./src/vue.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "files": [
+    "src",
+    "LICENSE",
+    "README.md"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "node --test --experimental-strip-types tests/*.test.ts"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "vue": {
+      "optional": true
+    }
+  },
+  "optionalDependencies": {
+    "@plurimath/plurimath": "^0.2.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3",
+    "vue": "^3.5.0",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

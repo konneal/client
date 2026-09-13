@@ -1,0 +1,82 @@
+/* @konneal/client renderer styles — the classes emitted by the core
+   renderers (markdown tables and code cards, citation references) and
+   the Vue components (source chips and badges). Theme-neutral: colors
+   and fonts come from the consumer's tokens (--color-accent,
+   --color-rule, --color-paper, --color-ink-soft, --color-ink-muted,
+   --font-mono). Import once from the consumer's global stylesheet. */
+
+.md-table { border-collapse: collapse; margin: 0.5rem 0; font-size: 0.85rem; }
+.md-table th, .md-table td {
+  border: 1px solid var(--color-rule);
+  padding: 0.3rem 0.6rem;
+  text-align: left;
+}
+.md-table th { background: color-mix(in srgb, var(--color-rule) 18%, transparent); font-weight: 600; }
+
+.code-card {
+  background: var(--color-paper-deep, #eee7d7);
+  border: 1px solid var(--color-rule);
+  border-radius: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+  font-family: var(--font-mono, "IBM Plex Mono", monospace);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.src-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-radius: 9999px;
+  padding: 0.05rem 0.45rem;
+  border: 1px solid var(--color-rule);
+  color: var(--color-ink-muted);
+  white-space: nowrap;
+}
+.src-badge.in-force { border-color: color-mix(in srgb, var(--color-accent) 45%, transparent); color: var(--color-accent); }
+.src-badge.superseded { border-color: #b45309; color: #b45309; }
+.src-badge.withdrawn { border-color: #b91c1c; color: #b91c1c; }
+
+/* sources: numbered chips, expand on click */
+.src-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.src-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid var(--color-rule);
+  border-radius: 9999px;
+  padding: 0.15rem 0.55rem 0.15rem 0.2rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  background: var(--color-paper);
+  transition: border-color 0.15s, color 0.15s;
+  max-width: 100%;
+}
+.src-chip:hover, .src-chip.open { border-color: var(--color-accent); color: var(--color-accent); }
+.src-chip .n {
+  display: inline-grid;
+  place-items: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 9999px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.62rem;
+}
+.src-card { margin: 0.4rem 0 0.6rem; }
+.src-card .src-badge { margin-left: 0.3rem; }
+
+/* inline citation references inside answers */
+.cite-ref {
+  color: var(--color-accent);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--color-accent);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.cite-ref:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }

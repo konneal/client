@@ -187,3 +187,10 @@ test("askStreamed handles a non-streamed JSON answer", async () => {
     globalThis.fetch = orig;
   }
 });
+
+test("docSlug drops the edition year and (Annexes) — the mirror keys by base identifier", () => {
+  assert.equal(docSlug("OIML R 60:2021"), "oiml-r-60");
+  assert.equal(docSlug("OIML R 60 (Annexes)"), "oiml-r-60");
+  assert.equal(docSlug("OIML R 60-1:2021"), "oiml-r-60-1");
+  assert.equal(docSlug("OIML B 18:2025"), "oiml-b-18");
+});

@@ -12,7 +12,12 @@ const anchorCache = new Map<string, Promise<Record<string, string> | null>>();
 export function docSlug(docidentifier: string): string {
   const hit = slugCache.get(docidentifier);
   if (hit) return hit;
-  const slug = docidentifier.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  // The mirror uploads renderings keyed by the publication's base
+  // identifier — the edition year and the "(Annexes)" suffix never
+  // name a separate rendering (they cite the same document), so they
+  // are dropped from the slug before lookup.
+  const base = docidentifier.replace(/\s*\(Annexes\)\s*$/i, "").replace(/:\d{4}$/, "");
+  const slug = base.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   slugCache.set(docidentifier, slug);
   return slug;
 }

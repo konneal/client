@@ -5,7 +5,14 @@
 // scrolls to the anchor natively; a highlight makes the clause pop.
 import { onMounted, onUnmounted, ref, watch } from "vue";
 
-const props = defineProps<{ open: boolean; url: string; label: string; clause?: string }>();
+const props = defineProps<{
+  open: boolean;
+  url: string;
+  label: string;
+  clause?: string;
+  note?: string;
+  frameTitle?: string;
+}>();
 const emit = defineEmits<{ close: [] }>();
 
 const frame = ref<HTMLIFrameElement | null>(null);
@@ -36,10 +43,10 @@ watch(() => props.url, () => frame.value?.addEventListener("load", highlight, { 
       <aside class="doc-pane" role="dialog" :aria-label="`Original document — ${label}`">
         <header class="doc-pane-bar">
           <span class="truncate font-mono text-xs text-ink-soft">{{ label }}{{ clause ? ` §${clause}` : "" }}</span>
-          <span class="text-[0.65rem] text-ink-muted hidden sm:inline">the original document, at the cited clause</span>
+          <span class="text-[0.65rem] text-ink-muted hidden sm:inline">{{ note ?? "the original document, at the cited clause" }}</span>
           <button type="button" class="ml-auto px-2 text-ink-muted hover:text-ink" aria-label="Close" @click="emit('close')">✕</button>
         </header>
-        <iframe ref="frame" :src="url" class="doc-pane-frame" title="Original document" @load="highlight" />
+        <iframe ref="frame" :src="url" class="doc-pane-frame" :title="frameTitle ?? 'Original document'" @load="highlight" />
       </aside>
     </div>
   </Teleport>

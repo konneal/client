@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withDefaults } from "vue";
+const defaultLabels = { sources: "Sources", open: "Open ↗" };
 // Sources as numbered chips; each expands a detail card under the row.
 // Inline [n] references in the answer link to these chips (openIdx is
 // lifted so the body's cite-refs can drive it).
@@ -7,7 +9,14 @@ import type { Citation } from "../types";
 import { citationLabel, cleanSnippet, stripAnchorDup } from "../citations";
 import { docTarget } from "../docs";
 
-const props = defineProps<{ cites: Citation[]; openIdx: number | null }>();
+const props = withDefaults(
+  defineProps<{
+    cites: Citation[];
+    openIdx: number | null;
+    labels?: { sources: string; open: string };
+  }>(),
+  { labels: () => defaultLabels },
+);
 const emit = defineEmits<{ toggle: [i: number] }>();
 
 // metanorma-mirror: deep links resolve lazily — most citations never
@@ -28,7 +37,7 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
 
 <template>
   <div v-if="cites.length" class="mt-4 pt-3 border-t border-dashed border-rule">
-    <div class="font-mono text-[0.68rem] uppercase tracking-wider text-ink-muted mb-1.5">Sources</div>
+    <div class="font-mono text-[0.68rem] uppercase tracking-wider text-ink-muted mb-1.5">{{ labels.sources }}</div>
     <div class="src-chips">
       <button
         v-for="(c, i) in cites"
@@ -76,7 +85,7 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
           </div>
           <div v-if="resolve(i, c)" class="mt-1.5 flex items-center gap-3 text-xs">
             <button type="button" class="text-accent underline" title="Read the original document at this clause, in context" @click="openPane(c, resolve(i, c)!)">In context</button>
-            <a :href="resolve(i, c)!.url" target="_blank" class="text-accent underline" title="Open the original document at this clause in a new tab">Open ↗</a>
+            <a :href="resolve(i, c)!.url" target="_blank" class="text-accent underline" title="Open the original document at this clause in a new tab">{{ labels.open }}</a>
           </div>
         </div>
       </div>

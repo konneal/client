@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { withDefaults } from "vue";
 // Sources as numbered chips; each expands a detail card under the row.
 // Inline [n] references in the answer link to these chips (openIdx is
 // lifted so the body's cite-refs can drive it).

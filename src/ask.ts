@@ -31,7 +31,7 @@ export interface AskEvents {
     blocks?: unknown[],
     meta?: {
       servedFrom?: "cache" | "similar";
-      passages?: { d: string; a: string; t: string }[];
+      passages?: { d: string; a: string; t: string; s?: { cols: string[]; rowsShown: number; rowsTotal: number } }[];
       read?: { intent: string; doc: string | null; edition: string | null; term: string | null; terms: string[]; lang: string | null };
     },
   ) => void;
@@ -88,7 +88,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       data?.query_hash ?? null,
       Array.isArray(data?.follow_ups) ? data.follow_ups : [],
       Array.isArray(data?.blocks) ? data.blocks : [],
-      { servedFrom: data?.cached ? "cache" : data?.similar ? "similar" : undefined, read: data?.read ?? undefined, passages: Array.isArray(data?.context) ? data.context.map((c: { doc_id?: string; clause_anchor?: string; text?: string }) => ({ d: c.doc_id ?? "", a: c.clause_anchor ?? "", t: c.text ?? "" })) : undefined },
+      { servedFrom: data?.cached ? "cache" : data?.similar ? "similar" : undefined, read: data?.read ?? undefined, passages: Array.isArray(data?.context) ? data.context.map((c: { doc_id?: string; clause_anchor?: string; text?: string; sel?: { cols: string[]; rowsShown: number; rowsTotal: number } }) => ({ d: c.doc_id ?? "", a: c.clause_anchor ?? "", t: c.text ?? "", ...(c.sel ? { s: c.sel } : {}) })) : undefined },
     );
     return { ok: true };
   }

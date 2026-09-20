@@ -158,13 +158,49 @@ export async function sendFeedback(queryHash: string, rating: 1 | -1): Promise<v
 
 /** Deep-research (members): bounded agentic loop server-side; returns a
  *  complete answer with citations + research metadata. Not streamed. */
-export async function askResearch(query: string, prev?: string): Promise<{ ok: boolean; answer?: string; citations?: unknown[]; blocks?: unknown[]; research?: { iterations: number; passages: number; elapsed_ms: number }; errorMessage?: string }> {
+export interface ResearchPass {
+  n: number;
+  of: number;
+  phase: "retrieving" | "judged" | "writing";
+  passages?: number;
+  sufficient?: boolean | null;
+  missing?: string;
+}
+export async function askResearch(
+  query: string,
+  prev?: string,
+  onPass?: (p: ResearchPass) => void,
+): Promise<{ ok: boolean; answer?: string; citations?: unknown[]; blocks?: unknown[]; research?: { iterations: number; passages: number; elapsed_ms: number; sufficient?: boolean | null }; errorMessage?: string }> {
   try {
     const res = await fetch("/api/research", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query, prev }),
+      body: JSON.stringify({ query, prev, ...(onPass ? { stream: true } : {}) }),
     });
+    if (onPass && (res.headers.get("content-type") ?? "").includes("text/event-stream")) {
+      const reader = res.body!.getReader();
+      const dec = new TextDecoder();
+      let buf = "";
+      let done: any = null;
+      for (;;) {
+        const { done: rd, value } = await reader.read();
+        if (rd) break;
+        buf += dec.decode(value, { stream: true });
+        const parts = buf.split("\n\n");
+        buf = parts.pop() ?? "";
+        for (const part of parts) {
+          const line = part.trim();
+          if (!line.startsWith("data:")) continue;
+          let evt: any;
+          try { evt = JSON.parse(line.slice(5).trim()); } catch { continue; }
+          if (evt.type === "pass") onPass(evt as ResearchPass);
+          else if (evt.type === "done") done = evt;
+          else if (evt.type === "error") return { ok: false, errorMessage: evt.message || "The research failed." };
+        }
+      }
+      if (done) return { ok: true, answer: done.answer, citations: done.citations, blocks: done.blocks, research: done.research };
+      return { ok: false, errorMessage: "The stream ended before the answer." };
+    }
     const data = await res.json().catch(() => null);
     if (!res.ok) return { ok: false, errorMessage: data?.error?.message || `Request failed (${res.status}).` };
     return { ok: true, answer: data.answer, citations: data.citations, blocks: data.blocks, research: data.research };

@@ -29,7 +29,11 @@ export interface AskEvents {
     queryHash: string | null,
     followUps?: string[],
     blocks?: unknown[],
-    meta?: { servedFrom?: "cache" | "similar"; passages?: { d: string; a: string; t: string }[] },
+    meta?: {
+      servedFrom?: "cache" | "similar";
+      passages?: { d: string; a: string; t: string }[];
+      read?: { intent: string; doc: string | null; edition: string | null; term: string | null; terms: string[]; lang: string | null };
+    },
   ) => void;
   onError?: (message: string) => void;
 }
@@ -84,7 +88,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       data?.query_hash ?? null,
       Array.isArray(data?.follow_ups) ? data.follow_ups : [],
       Array.isArray(data?.blocks) ? data.blocks : [],
-      { servedFrom: data?.cached ? "cache" : data?.similar ? "similar" : undefined, passages: Array.isArray(data?.context) ? data.context.map((c: { doc_id?: string; clause_anchor?: string; text?: string }) => ({ d: c.doc_id ?? "", a: c.clause_anchor ?? "", t: c.text ?? "" })) : undefined },
+      { servedFrom: data?.cached ? "cache" : data?.similar ? "similar" : undefined, read: data?.read ?? undefined, passages: Array.isArray(data?.context) ? data.context.map((c: { doc_id?: string; clause_anchor?: string; text?: string }) => ({ d: c.doc_id ?? "", a: c.clause_anchor ?? "", t: c.text ?? "" })) : undefined },
     );
     return { ok: true };
   }
@@ -117,7 +121,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
           evt.query_hash ?? null,
           Array.isArray(evt.follow_ups) ? evt.follow_ups : [],
           Array.isArray(evt.blocks) ? evt.blocks : [],
-          { servedFrom: evt.served_from, passages: Array.isArray(evt.passages) ? evt.passages : undefined },
+          { servedFrom: evt.served_from, read: evt.read ?? undefined, passages: Array.isArray(evt.passages) ? evt.passages : undefined },
         );
       } else if (evt.type === "error") {
         ev.onError?.(evt.message || "Stream error.");

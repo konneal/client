@@ -25,6 +25,10 @@ export interface Message {
    *  said, never reconstructed */
   servedFrom?: "cache" | "similar";
   passages?: { d: string; a: string; t: string }[];
+  /** how the question was read — the interpretation that steered retrieval */
+  read?: { intent: string; doc: string | null; edition: string | null; term: string | null; terms: string[]; lang: string | null };
+  /** earlier answers this message replaced (regeneration keeps them) */
+  previous?: { content: string; at?: string }[];
   /** answer contract v2: server-validated typed MKO blocks ([[u:]] refs) */
   blocks?: { unit_id: string; type: string; docidentifier: string; edition?: string; payload: Record<string, unknown> }[];
   at: number;

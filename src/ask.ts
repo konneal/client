@@ -25,7 +25,12 @@ export interface AskEvents {
   onCitations?: (citations: Citation[]) => void;
   onQuota?: (quota: Quota) => void;
   onToken?: (tok: string) => void;
-  onDone?: (queryHash: string | null, followUps?: string[], blocks?: unknown[]) => void;
+  onDone?: (
+    queryHash: string | null,
+    followUps?: string[],
+    blocks?: unknown[],
+    meta?: { servedFrom?: "cache" | "similar"; passages?: { d: string; a: string; t: string }[] },
+  ) => void;
   onError?: (message: string) => void;
 }
 
@@ -75,7 +80,12 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
     if (data?.citations) ev.onCitations?.(data.citations);
     if (data?.quota) ev.onQuota?.(data.quota);
     if (data?.answer) ev.onToken?.(data.answer);
-    ev.onDone?.(data?.query_hash ?? null, Array.isArray(data?.follow_ups) ? data.follow_ups : [], Array.isArray(data?.blocks) ? data.blocks : []);
+    ev.onDone?.(
+      data?.query_hash ?? null,
+      Array.isArray(data?.follow_ups) ? data.follow_ups : [],
+      Array.isArray(data?.blocks) ? data.blocks : [],
+      { servedFrom: data?.cached ? "cache" : data?.similar ? "similar" : undefined, passages: Array.isArray(data?.context) ? data.context.map((c: { doc_id?: string; clause_anchor?: string; text?: string }) => ({ d: c.doc_id ?? "", a: c.clause_anchor ?? "", t: c.text ?? "" })) : undefined },
+    );
     return { ok: true };
   }
 
@@ -103,7 +113,12 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       } else if (evt.type === "token") {
         ev.onToken?.(evt.v ?? "");
       } else if (evt.type === "done") {
-        ev.onDone?.(evt.query_hash ?? null, Array.isArray(evt.follow_ups) ? evt.follow_ups : [], Array.isArray(evt.blocks) ? evt.blocks : []);
+        ev.onDone?.(
+          evt.query_hash ?? null,
+          Array.isArray(evt.follow_ups) ? evt.follow_ups : [],
+          Array.isArray(evt.blocks) ? evt.blocks : [],
+          { servedFrom: evt.served_from, passages: Array.isArray(evt.passages) ? evt.passages : undefined },
+        );
       } else if (evt.type === "error") {
         ev.onError?.(evt.message || "Stream error.");
       }

@@ -21,6 +21,10 @@ export interface Message {
   model?: string;
   queryHash?: string;
   followUps?: string[];
+  /** where the answer came from and what grounded it — as the response
+   *  said, never reconstructed */
+  servedFrom?: "cache" | "similar";
+  passages?: { d: string; a: string; t: string }[];
   /** answer contract v2: server-validated typed MKO blocks ([[u:]] refs) */
   blocks?: { unit_id: string; type: string; docidentifier: string; edition?: string; payload: Record<string, unknown> }[];
   at: number;

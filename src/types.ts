@@ -24,7 +24,7 @@ export interface Message {
   /** where the answer came from and what grounded it — as the response
    *  said, never reconstructed */
   servedFrom?: "cache" | "similar";
-  passages?: { d: string; a: string; t: string }[];
+  passages?: { d: string; a: string; t: string; s?: { cols: string[]; rowsShown: number; rowsTotal: number } }[];
   /** how the question was read — the interpretation that steered retrieval */
   read?: { intent: string; doc: string | null; edition: string | null; term: string | null; terms: string[]; lang: string | null };
   /** earlier answers this message replaced (regeneration keeps them) */

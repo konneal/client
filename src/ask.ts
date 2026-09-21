@@ -21,10 +21,21 @@ export interface AskOptions {
   signal?: AbortSignal;
 }
 
+export type AskRead = {
+  intent: string;
+  doc: string | null;
+  edition: string | null;
+  term: string | null;
+  terms: string[];
+  lang: string | null;
+};
+
 export interface AskEvents {
   onCitations?: (citations: Citation[]) => void;
   onQuota?: (quota: Quota) => void;
   onToken?: (tok: string) => void;
+  /** fires when the stream opens with the reading — before citations and tokens */
+  onRead?: (read: AskRead) => void;
   onDone?: (
     queryHash: string | null,
     followUps?: string[],
@@ -32,7 +43,7 @@ export interface AskEvents {
     meta?: {
       servedFrom?: "cache" | "similar";
       passages?: { d: string; a: string; t: string; s?: { cols: string[]; rowsShown: number; rowsTotal: number } }[];
-      read?: { intent: string; doc: string | null; edition: string | null; term: string | null; terms: string[]; lang: string | null };
+      read?: AskRead;
     },
   ) => void;
   onError?: (message: string) => void;
@@ -81,6 +92,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
   const ct = res.headers.get("content-type") ?? "";
   if (ct.includes("application/json")) {
     const data = await res.json().catch(() => null);
+    if (data?.read) ev.onRead?.(data.read);
     if (data?.citations) ev.onCitations?.(data.citations);
     if (data?.quota) ev.onQuota?.(data.quota);
     if (data?.answer) ev.onToken?.(data.answer);
@@ -111,7 +123,8 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       } catch {
         continue;
       }
-      if (evt.type === "citations") {
+      if (evt.type === "read") ev.onRead?.(evt.read);
+      else if (evt.type === "citations") {
         ev.onCitations?.(evt.citations ?? []);
         if (evt.quota) ev.onQuota?.(evt.quota);
       } else if (evt.type === "token") {

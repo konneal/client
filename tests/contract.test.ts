@@ -110,6 +110,30 @@ function sseResponse(frames: string[], headers: Record<string, string> = {}): Re
   return new Response(stream, { headers: { "content-type": "text/event-stream", ...headers } });
 }
 
+test("askStreamed dispatches read before citations and tokens", async () => {
+  const orig = globalThis.fetch;
+  globalThis.fetch = (async () =>
+    sseResponse([
+      'data: {"type":"read","read":{"intent":"definition","doc":"OIML R 76","edition":"2006","term":"maximum permissible error","terms":[],"lang":"en"}}\n\n',
+      'data: {"type":"citations","citations":[{"doc_id":"d1","docidentifier":"R 76"}]}\n\n',
+      'data: {"type":"token","v":"The "}\n\n',
+      'data: {"type":"done","query_hash":"h1","follow_ups":[],"blocks":[],"read":{"intent":"definition","doc":"OIML R 76","edition":"2006","term":"maximum permissible error","terms":[],"lang":"en"}}\n\n',
+    ])) as typeof fetch;
+  try {
+    const seen: string[] = [];
+    const res = await askStreamed("q", {}, {
+      onRead: (r) => { seen.push(`read:${r.doc}:${r.term}`); },
+      onCitations: (c) => { seen.push(`citations:${c.length}`); },
+      onToken: (t) => { seen.push(t); },
+      onDone: (h, _f, _b, meta) => { seen.push(`done:${h}:${meta?.read?.doc ?? ""}`); },
+    });
+    assert.ok(res.ok);
+    assert.deepEqual(seen, ["read:OIML R 76:maximum permissible error", "citations:1", "The ", "done:h1:OIML R 76"]);
+  } finally {
+    globalThis.fetch = orig;
+  }
+});
+
 test("askStreamed dispatches citations, tokens and done", async () => {
   const orig = globalThis.fetch;
   const bodies: unknown[] = [];

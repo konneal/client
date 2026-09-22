@@ -81,7 +81,7 @@ async function keys() {
 
 const [cmd, ...rest] = argv.slice(2);
 const q = rest.filter((a) => !a.startsWith("--")).join(" ");
-if (cmd === "ask") await ask(q, { licensed: rest.filter((a => rest[i - 1] === "--licensed"), stream: !rest.includes("--no-stream") });
+if (cmd === "ask") await ask(q, { licensed: rest.filter((a, i) => rest[i - 1] === "--licensed"), stream: !rest.includes("--no-stream") });
 else if (cmd === "search") await search(q, Number(rest[rest.indexOf("--k") + 1] || 5));
 else if (cmd === "keys" && rest[0] === "list") await keys();
 else console.log(usage);

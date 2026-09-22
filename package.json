@@ -1,6 +1,6 @@
 {
   "name": "@konneal/client",
-  "version": "0.2.3",
+  "version": "0.2.5",
   "description": "The Konneal publisher-site contract: engine API types, the SSE ask client, and the answer-contract renderers (citation chips, typed unit blocks, formulas, the in-context document pane) Ships the konneal CLI (ask, search, keys) for humans and operators.",
   "license": "BSD-3-Clause",
   "type": "module",
@@ -11,9 +11,10 @@
     "./styles.css": "./src/styles.css"
   },
   "files": [
-    "src",
     "LICENSE",
-    "README.md"
+    "README.md",
+    "src",
+    "dist/cli.js"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
@@ -39,6 +40,6 @@
     "node": ">=20"
   },
   "bin": {
-    "konneal": "./src/cli.ts"
+    "konneal": "./dist/cli.js"
   }
 }

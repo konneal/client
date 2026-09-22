@@ -9,6 +9,21 @@ import type { Citation } from "./types";
 const slugCache = new Map<string, string>();
 const anchorCache = new Map<string, Promise<Record<string, string> | null>>();
 
+// A deployment maps internal-corpus citations to their own document
+// origin (the internal renderings live behind the member-only door, not
+// the site's origin). Publisher-neutral: nothing here knows the base —
+// the site configures it once at startup.
+let baseFor: ((c: { corpus?: string }) => string | undefined) | null = null;
+
+export function configureDocs(opts: { baseFor?: (c: { corpus?: string }) => string | undefined }): void {
+  baseFor = opts.baseFor ?? null;
+}
+
+function docBase(c: { corpus?: string }): string {
+  const base = baseFor?.(c);
+  return base ? base.replace(/\/+$/, "") : "";
+}
+
 export function docSlug(docidentifier: string): string {
   const hit = slugCache.get(docidentifier);
   if (hit) return hit;
@@ -24,12 +39,13 @@ export function docSlug(docidentifier: string): string {
 
 /** The clause-anchor map for a document; null when the document is not
  *  rendered (dirty corpus, unmapped) — callers degrade to the chip. */
-export function docAnchors(docidentifier: string): Promise<Record<string, string> | null> {
+export function docAnchors(docidentifier: string, c?: { corpus?: string }): Promise<Record<string, string> | null> {
   const slug = docSlug(docidentifier);
-  if (!anchorCache.has(slug)) {
+  const key = `${docBase(c ?? {})}|${slug}`;
+  if (!anchorCache.has(key)) {
     anchorCache.set(
-      slug,
-      fetch(`/docs/${slug}.anchors.json`)
+      key,
+      fetch(`${docBase(c ?? {})}/docs/${slug}.anchors.json`)
         .then((r) => (r.ok ? r.json() : null))
         .catch(() => null),
     );
@@ -48,11 +64,11 @@ export interface DocTarget {
 export async function docTarget(c: Citation): Promise<DocTarget | null> {
   if (!c.docidentifier) return null;
   const slug = docSlug(c.docidentifier);
-  const anchors = await docAnchors(c.docidentifier);
+  const anchors = await docAnchors(c.docidentifier, c);
   if (!anchors) return null;
   const clause = (c.clause_anchor || "").trim();
   const anchor = clause && anchors[clause] ? anchors[clause] : firstPrefix(anchors, clause);
-  return { url: `/docs/${slug}.html${anchor ? `#${anchor}` : ""}`, anchor };
+  return { url: `${docBase(c)}/docs/${slug}.html${anchor ? `#${anchor}` : ""}`, anchor };
 }
 
 function firstPrefix(anchors: Record<string, string>, clause: string): string | null {

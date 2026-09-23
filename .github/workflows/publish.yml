@@ -28,5 +28,9 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm test
+      - name: smoke the shipped bin (a broken bin never publishes)
+        run: |
+          out=$(node dist/cli.js) ; echo "$out"
+          echo "$out" | grep -q "konneal — ask a Konneal deployment"
       - name: publish (OIDC, provenance-attested)
         run: npm publish --access public --provenance

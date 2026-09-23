@@ -52,3 +52,14 @@ vite: { optimizeDeps: { exclude: ["@konneal/client"] } }
 The package is framework-agnostic at its core: everything except
 `./vue` is dependency-free TypeScript with the DOM `fetch` as the only
 runtime surface.
+
+## The konneal CLI
+
+```sh
+npm i -g @konneal/client
+export KONNEAL_BASE=https://your-deployment KONNEAL_KEY=your-api-key
+konneal ask "What is a load cell?"            # SSE ask: reading line, tokens, citations, verdicts
+konneal ask "…" --no-stream --licensed std:iec-60068-2-78
+konneal search "damp heat" --k 5              # ranked passages, JSON
+konneal keys list                             # admin: KONNEAL_ADMIN token
+```

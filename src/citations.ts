@@ -39,13 +39,16 @@ export function cleanSnippet(snippet: string, anchor?: string | number): string 
   return s;
 }
 
-/** Wrap [n] and [OIML …] citation labels in the ESCAPED rendered answer
- *  with anchors that point at the source chips. Operates on the
- *  escape-first markdown output string — it only ever touches text. */
-export function linkifyCitations(html: string, cites: Citation[], publisher = "OIML"): string {
+/** Wrap [n] and [<publisher> …] citation labels in the ESCAPED rendered
+ *  answer with anchors that point at the source chips. The publisher
+ *  prefix is the DEPLOYMENT's own label vocabulary — pass it explicitly;
+ *  without it only numbered references link. Operates on the escape-first
+ *  markdown output string — it only ever touches text. */
+export function linkifyCitations(html: string, cites: Citation[], publisher = ""): string {
   if (!cites?.length) return html;
   const chipTargets = cites.map((c) => citationLabel(c));
-  return html.replace(new RegExp(`\\[((?:\\d{1,2})|${publisher}[^\\]]{2,70})\\]`, "g"), (m, inner: string) => {
+  const label = publisher ? `|(?:${publisher})[^\\]]{2,70}` : "";
+  return html.replace(new RegExp(`\\[((?:\\d{1,2})${label})\\]`, "g"), (m, inner: string) => {
     let i = /^\d+$/.test(inner) ? Number(inner) - 1 : chipTargets.findIndex((lbl) => lbl.startsWith(inner.split("§")[0].trim()));
     if (i < 0 || i >= cites.length) return m;
     return `<a class="cite-ref" data-i="${i}" title="${chipTargets[i]}">[${i + 1}]</a>`;

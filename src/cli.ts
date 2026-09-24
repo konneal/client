@@ -7,7 +7,7 @@
 // (the API key; admins: KONNEAL_ADMIN for the admin token).
 import { argv, env } from "node:process";
 
-const BASE = (env.KONNEAL_BASE || "https://ai.oimlsmart.org").replace(/\/+$/, "");
+const BASE = (env.KONNEAL_BASE || "http://localhost:8787").replace(/\/+$/, "");
 const KEY = env.KONNEAL_KEY || "";
 const ADMIN = env.KONNEAL_ADMIN || "";
 

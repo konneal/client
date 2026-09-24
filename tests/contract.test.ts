@@ -11,20 +11,20 @@ import { askStreamed } from "../src/ask.ts";
 import type { Citation } from "../src/types.ts";
 
 const cite = (over: Partial<Citation> = {}): Citation => ({
-  doc_id: "d1", docidentifier: "OIML R 60-1:2004 (E)", ...over,
+  doc_id: "d1", docidentifier: "ACME AB 99-1:2019 (E)", ...over,
 });
 
 test("citationLabel strips language markers and dedupes the edition", () => {
-  assert.equal(citationLabel(cite()), "OIML R 60-1:2004");
+  assert.equal(citationLabel(cite()), "ACME AB 99-1:2019");
   assert.equal(citationLabel(cite({ docidentifier: "B 18:2025 (E)", edition: "2025" })), "B 18:2025");
   assert.equal(citationLabel(cite({ docidentifier: "PD-06 Edition 4", edition: "4" })), "PD-06 Edition 4");
   assert.equal(citationLabel(cite({ docidentifier: "R 49", edition: "2010" })), "R 49:2010");
 });
 
 test("citationLabel hides producer-UUID anchors and formats clause anchors", () => {
-  assert.equal(citationLabel(cite({ clause_anchor: "_c631773b-4bd0" })), "OIML R 60-1:2004");
-  assert.equal(citationLabel(cite({ clause_anchor: "2.11" })), "OIML R 60-1:2004 §2.11");
-  assert.equal(citationLabel(cite({ clause_anchor: "overview" })), "OIML R 60-1:2004 ov");
+  assert.equal(citationLabel(cite({ clause_anchor: "_c631773b-4bd0" })), "ACME AB 99-1:2019");
+  assert.equal(citationLabel(cite({ clause_anchor: "2.11" })), "ACME AB 99-1:2019 §2.11");
+  assert.equal(citationLabel(cite({ clause_anchor: "overview" })), "ACME AB 99-1:2019 ov");
 });
 
 test("stripAnchorDup presents each clause number exactly once", () => {
@@ -40,22 +40,22 @@ test("cleanSnippet removes the anchor prefix the extraction repeats", () => {
 test("linkifyCitations anchors numeric refs to the source chips", () => {
   const c = [cite(), cite({ docidentifier: "R 49" })];
   const out = linkifyCitations("<p>See [1] and [2].</p>", c);
-  assert.equal(out, '<p>See <a class="cite-ref" data-i="0" title="OIML R 60-1:2004">[1]</a> and <a class="cite-ref" data-i="1" title="R 49">[2]</a>.</p>');
+  assert.equal(out, '<p>See <a class="cite-ref" data-i="0" title="ACME AB 99-1:2019">[1]</a> and <a class="cite-ref" data-i="1" title="R 49">[2]</a>.</p>');
 });
 
 test("linkifyCitations matches publisher-name refs and passes unknown ones through", () => {
   const c = [cite()];
-  const out = linkifyCitations("[OIML R 60-1] says [9] and [OIML ZZZ]", c);
-  assert.ok(out.includes('<a class="cite-ref" data-i="0" title="OIML R 60-1:2004">[1]</a>'));
+  const out = linkifyCitations("[ACME AB 99-1] says [9] and [ACME ZZZ]", c, "ACME");
+  assert.ok(out.includes('<a class="cite-ref" data-i="0" title="ACME AB 99-1:2019">[1]</a>'));
   assert.match(out, /\[9\]/);
-  assert.match(out, /\[OIML ZZZ\]/);
+  assert.match(out, /\[ACME ZZZ\]/);
 });
 
 test("linkifyCitations takes the publisher prefix as a parameter", () => {
   const c = [cite({ docidentifier: "ISO 17025" })];
   const out = linkifyCitations("[ISO 17025] governs.", c, "ISO");
   assert.match(out, /data-i="0"/);
-  // with the default prefix, the ISO label is not linkified
+  // without a publisher prefix, non-numeric labels are not linkified
   const dflt = linkifyCitations("[ISO 17025] governs.", c);
   assert.equal(dflt, "[ISO 17025] governs.");
 });
@@ -93,7 +93,7 @@ test("renderMarkdown keeps fenced code out of the inline rules", () => {
 // ── docs: the slug law (must match the mirror uploader) ───────────────
 
 test("docSlug collapses every non-alphanumeric run to a single dash", () => {
-  assert.equal(docSlug("OIML R 60-1:2004 (E)"), "oiml-r-60-1-2004-e");
+  assert.equal(docSlug("ACME AB 99-1:2019 (E)"), "acme-ab-99-1-2019-e");
   assert.equal(docSlug("V 2--200 ?? edition"), "v-2-200-edition");
 });
 

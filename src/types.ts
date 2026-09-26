@@ -10,6 +10,10 @@ export interface Citation {
   status?: string;
   superseded_by?: string;
   corpus?: string;
+  /** the answer-quality ladder rung (engine quality.ts): "verified" =
+   *  the model plane, "curated" = the edited Metanorma corpus, "ocr" =
+   *  the experimental OCR lane */
+  quality?: "verified" | "curated" | "ocr";
   url?: string;
 }
 

@@ -35,6 +35,10 @@ export interface Message {
   previous?: { content: string; at?: string }[];
   /** answer contract v2: server-validated typed MKO blocks ([[u:]] refs) */
   blocks?: { unit_id: string; type: string; docidentifier: string; edition?: string; payload: Record<string, unknown> }[];
+  /** the answer-quality ladder (engine quality.ts): the WORST rung the
+   *  answer's citations stand on, with the service's own one-line note */
+  sourceQuality?: "verified" | "curated" | "ocr" | null;
+  qualityNote?: string | null;
   at: number;
 }
 

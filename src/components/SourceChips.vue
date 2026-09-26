@@ -79,7 +79,7 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
       >
         <span class="n">{{ nums(g) }}</span>
         <span class="truncate">{{ citationLabel(g.members[0].c) }}</span>
-        <span v-if="g.members.length > 1" class="text-[0.65rem] text-ink-muted">×{{ g.members.length }}</span>
+        <span v-if="g.members.length > 1" class="src-count" :title="`${g.members.length} passages from this source`">{{ g.members.length }}</span>
         <a
           v-if="g.members[0].c.url"
           :href="g.members[0].c.url"
@@ -99,7 +99,7 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
         v-for="m in groupOf(openIdx)?.members ?? []"
         v-show="groupOf(openIdx)"
         :key="'card' + m.i"
-        class="src-card open-card"
+        class="src-card open-card src-member"
       >
         <div class="border-l-2 border-accent bg-accent-soft/60 dark:bg-accent-soft/40 rounded-r-lg px-3 py-2">
           <div class="flex items-center gap-2 flex-wrap">

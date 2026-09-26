@@ -38,7 +38,8 @@ export interface Message {
   /** the answer-quality ladder (engine quality.ts): the WORST rung the
    *  answer's citations stand on, with the service's own one-line note */
   sourceQuality?: "verified" | "curated" | "ocr" | null;
-  qualityNote?: string | null;
+  /** the answer's confidence statement (the engine's confidence_note) */
+  confidenceNote?: string | null;
   at: number;
 }
 

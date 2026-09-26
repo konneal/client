@@ -71,6 +71,29 @@
 .src-card { margin: 0.4rem 0 0.6rem; }
 .src-card .src-badge { margin-left: 0.3rem; }
 
+/* the stacked group chip: the counter reads like a stamped plate tab —
+   the stack's size is the one raised element in the row */
+.src-chip .src-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.1rem;
+  padding: 0 0.25rem;
+  margin-left: 0.15rem;
+  border: 1px solid color-mix(in srgb, currentcolor 45%, transparent);
+  border-radius: 0.3rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+.src-chip.open .src-count { border-color: var(--color-accent); color: var(--color-accent); }
+
+/* a group's card: one plate, its member citations separated by clause
+   rules — the document is one source, read clause by clause */
+.src-card .src-members > .src-member + .src-member { border-top: 1px dashed var(--color-rule); margin-top: 0.5rem; padding-top: 0.5rem; }
+.src-member .src-member-n { font-family: var(--font-mono, monospace); font-size: 0.65rem; color: var(--color-accent); }
+
 /* inline citation references inside answers */
 .cite-ref {
   color: var(--color-accent);

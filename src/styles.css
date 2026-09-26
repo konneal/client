@@ -80,3 +80,8 @@
   white-space: nowrap;
 }
 .cite-ref:hover { background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+
+/* the answer-quality ladder's rung badges (engine quality.ts) */
+.src-badge.quality-verified { border-color: #047857; color: #047857; }
+.src-badge.quality-curated { border-color: #1d4ed8; color: #1d4ed8; }
+.src-badge.quality-ocr { border-color: #b45309; color: #b45309; }

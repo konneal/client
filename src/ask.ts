@@ -31,7 +31,7 @@ export type AskRead = {
 };
 
 export interface AskEvents {
-  onCitations?: (citations: Citation[], quality?: { sourceQuality: "verified" | "curated" | "ocr" | null; qualityNote: string | null }) => void;
+  onCitations?: (citations: Citation[], quality?: { sourceQuality: "verified" | "curated" | "ocr" | null; confidenceNote: string | null }) => void;
   onQuota?: (quota: Quota) => void;
   onToken?: (tok: string) => void;
   /** fires when the stream opens with the reading — before citations and tokens */
@@ -93,7 +93,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
   if (ct.includes("application/json")) {
     const data = await res.json().catch(() => null);
     if (data?.read) ev.onRead?.(data.read);
-    if (data?.citations) ev.onCitations?.(data.citations, { sourceQuality: data.source_quality ?? null, qualityNote: data.quality_note ?? null });
+    if (data?.citations) ev.onCitations?.(data.citations, { sourceQuality: data.source_quality ?? null, confidenceNote: data.confidence_note ?? null });
     if (data?.quota) ev.onQuota?.(data.quota);
     if (data?.answer) ev.onToken?.(data.answer);
     ev.onDone?.(
@@ -125,7 +125,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       }
       if (evt.type === "read") ev.onRead?.(evt.read);
       else if (evt.type === "citations") {
-        ev.onCitations?.(evt.citations ?? [], { sourceQuality: evt.source_quality ?? null, qualityNote: evt.quality_note ?? null });
+        ev.onCitations?.(evt.citations ?? [], { sourceQuality: evt.source_quality ?? null, confidenceNote: evt.confidence_note ?? null });
         if (evt.quota) ev.onQuota?.(evt.quota);
       } else if (evt.type === "token") {
         ev.onToken?.(evt.v ?? "");

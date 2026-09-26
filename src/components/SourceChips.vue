@@ -7,7 +7,7 @@
 // cites them. Inline [n] references still drive openIdx directly.
 import { computed, ref } from "vue";
 import type { Citation } from "../types";
-import { citationLabel, cleanSnippet, stripAnchorDup } from "../citations";
+import { citationLabel, cleanSnippet, stripAnchorDup, groupCitations, type CitationGroup } from "../citations";
 import { docTarget } from "../docs";
 
 const props = withDefaults(
@@ -22,32 +22,21 @@ const props = withDefaults(
 );
 const emit = defineEmits<{ toggle: [i: number] }>();
 
-interface Group {
-  members: { i: number; c: Citation }[];
-}
-
-// a group is a maximal RUN of same-document citations (doc_id + edition)
-// — adjacency keeps the chips' reading order aligned with the answer's
-const groups = computed<Group[]>(() => {
-  const out: Group[] = [];
-  for (let i = 0; i < props.cites.length; i++) {
-    const c = props.cites[i];
-    const last = out[out.length - 1];
-    const head = last?.members[0].c;
-    if (head && head.doc_id === c.doc_id && (head.edition ?? "") === (c.edition ?? "")) last.members.push({ i, c });
-    else out.push({ members: [{ i, c }] });
-  }
-  return out;
-});
+// a group is a maximal RUN of same-PUBLICATION citations (label
+// identity: docidentifier + edition — one publication's annex volumes
+// arrive under different doc_ids and must still stack). Adjacency keeps
+// the chips' reading order aligned with the answer's. The grouping and
+// its tests live in citations.ts (the SSOT).
+const groups = computed<CitationGroup<Citation>[]>(() => groupCitations(props.cites));
 
 const expanded = ref(false);
 const visible = computed(() => (expanded.value ? groups.value : groups.value.slice(0, props.max)));
 const hidden = computed(() => groups.value.length - visible.value.length);
 
-const nums = (g: Group) => g.members.map((m) => m.i + 1).join("·");
-const groupOf = (i: number | null) => (i == null ? null : groups.value.find((g) => g.members.some((m) => m.i === i)) ?? null);
-const isOpen = (g: Group) => g.members.some((m) => m.i === props.openIdx);
-const title = (g: Group) =>
+const nums = (g: CitationGroup<Citation>) => g.members.map((m) => m.i + 1).join("·");
+const groupOf = (i: number | null): CitationGroup<Citation> | null => (i == null ? null : groups.value.find((g) => g.members.some((m) => m.i === i)) ?? null);
+const isOpen = (g: CitationGroup<Citation>) => g.members.some((m) => m.i === props.openIdx);
+const title = (g: CitationGroup<Citation>) =>
   g.members.length === 1
     ? (g.members[0].c.clause_title || "") + " — click to expand"
     : g.members.map((m) => `[${m.i + 1}] ${stripAnchorDup(m.c.clause_title || "", m.c.clause_anchor) || m.c.clause_anchor}`).join("\n");

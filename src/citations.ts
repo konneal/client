@@ -54,3 +54,28 @@ export function linkifyCitations(html: string, cites: Citation[], publisher = ""
     return `<a class="cite-ref" data-i="${i}" title="${chipTargets[i]}">[${i + 1}]</a>`;
   });
 }
+
+// The chip-stack's grouping key: the PUBLICATION a reader names, not the
+// internal chunk id — one publication issued in parts and annex volumes
+// arrives as several doc_ids ("r060/annex-a", "r060/annex-b") that must
+// stack as one source. Label identity (docidentifier + edition) is the
+// reader-visible criterion; the id is only the fallback.
+export function citationKey(c: Pick<Citation, "docidentifier" | "doc_id" | "edition">): string {
+  return `${(c.docidentifier || c.doc_id || "source").trim()}\u0000${c.edition ?? ""}`;
+}
+
+export interface CitationGroup<C> {
+  members: { i: number; c: C }[];
+}
+
+/** Maximal runs of same-publication citations, in citation order. */
+export function groupCitations<C extends Pick<Citation, "docidentifier" | "doc_id" | "edition">>(cites: C[]): CitationGroup<C>[] {
+  const out: CitationGroup<C>[] = [];
+  for (let i = 0; i < cites.length; i++) {
+    const key = citationKey(cites[i]);
+    const last = out[out.length - 1];
+    if (last && citationKey(last.members[0].c) === key) last.members.push({ i, c: cites[i] });
+    else out.push({ members: [{ i, c: cites[i] }] });
+  }
+  return out;
+}

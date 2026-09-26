@@ -1,6 +1,6 @@
 {
   "name": "@konneal/client",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "The Konneal publisher-site contract: engine API types, the SSE ask client, and the answer-contract renderers (citation chips, typed unit blocks, formulas, the in-context document pane) Ships the konneal CLI (ask, search, keys) for humans and operators.",
   "license": "BSD-3-Clause",
   "type": "module",

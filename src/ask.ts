@@ -161,12 +161,12 @@ export async function fetchClientConfig(): Promise<ClientConfig> {
   }
 }
 
-export async function sendFeedback(queryHash: string, rating: 1 | -1): Promise<void> {
+export async function sendFeedback(queryHash: string, rating: 1 | -1, note?: string): Promise<void> {
   try {
     await fetch("/api/feedback", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ query_hash: queryHash, rating }),
+      body: JSON.stringify(note ? { query_hash: queryHash, rating, note } : { query_hash: queryHash, rating }),
     });
   } catch {
     /* non-critical */

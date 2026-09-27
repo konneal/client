@@ -30,6 +30,10 @@ const emit = defineEmits<{ toggle: [i: number] }>();
 const groups = computed<CitationGroup<Citation>[]>(() => groupCitations(props.cites));
 
 const expanded = ref(false);
+// the sources row stays COLLAPSED to one line until the reader engages:
+// hovering (or focusing) the count line reveals the chips — a permanent
+// wall of labeled sources under every answer was the rejected default
+const revealed = ref(false);
 const visible = computed(() => (expanded.value ? groups.value : groups.value.slice(0, props.max)));
 const hidden = computed(() => groups.value.length - visible.value.length);
 
@@ -65,7 +69,19 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
 </script>
 
 <template>
-  <div v-if="cites.length" class="mt-4 pt-3 border-t border-dashed border-rule">
+  <div v-if="cites.length" class="mt-4 pt-3 border-t border-dashed border-rule src-surface" @mouseenter="revealed = true" @mouseleave="revealed = false">
+    <button
+      v-if="!revealed"
+      type="button"
+      class="src-summary"
+      :title="title(groups[0])"
+      @click="revealed = true; emit('toggle', groups[0]?.members[0].i ?? 0)"
+    >
+      <span class="src-summary-label">{{ labels.sources }}</span>
+      <span class="src-summary-count">{{ cites.length }}</span>
+      <span class="src-summary-hint">hover to see the sources behind this answer</span>
+    </button>
+    <template v-else>
     <div class="font-mono text-[0.68rem] uppercase tracking-wider text-ink-muted mb-1.5">{{ labels.sources }}</div>
     <div class="src-chips">
       <button
@@ -94,6 +110,7 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
         <span class="n">+{{ hidden }}</span>
       </button>
     </div>
+    </template>
     <div class="src-cards">
       <div
         v-for="m in groupOf(openIdx)?.members ?? []"

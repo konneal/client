@@ -92,3 +92,7 @@
 .src-summary-label { font-family: var(--font-mono, monospace); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 600; }
 .src-summary-count { font-family: var(--font-mono, monospace); font-size: 0.66rem; border: 1px solid currentcolor; border-radius: 0.4rem; padding: 0 0.35rem; }
 .src-summary-hint { color: var(--ink-mute, #64748b); font-size: 0.72rem; }
+
+/* the latching reveal: the row stays hidden until the surface is engaged */
+.src-surface:not(.revealed) .src-chips { display: none; }
+.src-surface:not(.revealed) .src-cards { display: none; }

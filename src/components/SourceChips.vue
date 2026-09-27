@@ -69,20 +69,12 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
 </script>
 
 <template>
-  <div v-if="cites.length" class="mt-4 pt-3 border-t border-dashed border-rule src-surface" @mouseenter="revealed = true" @mouseleave="revealed = false">
-    <button
-      v-if="!revealed"
-      type="button"
-      class="src-summary"
-      :title="title(groups[0])"
-      @click="revealed = true; emit('toggle', groups[0]?.members[0].i ?? 0)"
-    >
+  <div v-if="cites.length" class="mt-4 pt-3 border-t border-dashed border-rule src-surface" :class="{ revealed }" @mouseenter="revealed = true">
+    <button type="button" class="src-summary" title="Show the sources behind this answer" @click="revealed = true">
       <span class="src-summary-label">{{ labels.sources }}</span>
       <span class="src-summary-count">{{ cites.length }}</span>
       <span class="src-summary-hint">hover to see the sources behind this answer</span>
     </button>
-    <template v-else>
-    <div class="font-mono text-[0.68rem] uppercase tracking-wider text-ink-muted mb-1.5">{{ labels.sources }}</div>
     <div class="src-chips">
       <button
         v-for="g in visible"
@@ -110,7 +102,6 @@ const openPane = (c: Citation, t: { url: string; anchor: string | null }) => {
         <span class="n">+{{ hidden }}</span>
       </button>
     </div>
-    </template>
     <div class="src-cards">
       <div
         v-for="m in groupOf(openIdx)?.members ?? []"

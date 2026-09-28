@@ -32,6 +32,9 @@ export type AskRead = {
 
 export interface AskEvents {
   onCitations?: (citations: Citation[], quality?: { sourceQuality: "verified" | "curated" | "ocr" | null; confidenceNote: string | null }) => void;
+  /** the measured confidence, when the entailment gate lands (may arrive
+   *  after done — the measurement never blocks the answer's chips) */
+  onConfidence?: (measured: { sourceQuality: "verified" | "curated" | "ocr" | null; confidenceNote: string | null; entailment?: { support: string; score: number; ungrounded?: string[] } | null }) => void;
   onQuota?: (quota: Quota) => void;
   onToken?: (tok: string) => void;
   /** fires when the stream opens with the reading — before citations and tokens */
@@ -94,6 +97,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
     const data = await res.json().catch(() => null);
     if (data?.read) ev.onRead?.(data.read);
     if (data?.citations) ev.onCitations?.(data.citations, { sourceQuality: data.source_quality ?? null, confidenceNote: data.confidence_note ?? null });
+    if (data?.entailment || data?.confidence_note) ev.onConfidence?.({ sourceQuality: data.source_quality ?? null, confidenceNote: data.confidence_note ?? null, entailment: data.entailment ?? null });
     if (data?.quota) ev.onQuota?.(data.quota);
     if (data?.answer) ev.onToken?.(data.answer);
     ev.onDone?.(
@@ -127,6 +131,8 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       else if (evt.type === "citations") {
         ev.onCitations?.(evt.citations ?? [], { sourceQuality: evt.source_quality ?? null, confidenceNote: evt.confidence_note ?? null });
         if (evt.quota) ev.onQuota?.(evt.quota);
+      } else if (evt.type === "confidence") {
+        ev.onConfidence?.({ sourceQuality: evt.source_quality ?? null, confidenceNote: evt.confidence_note ?? null, entailment: evt.entailment ?? null });
       } else if (evt.type === "token") {
         ev.onToken?.(evt.v ?? "");
       } else if (evt.type === "done") {

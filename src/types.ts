@@ -43,6 +43,8 @@ export interface Message {
   /** the entailment gate's measurement, when it landed (claim support in
    *  the cited passages — TODO.new-era/10) */
   entailment?: { support: string; score: number; ungrounded?: string[] } | null;
+  /** the message's stored attachment (a member's uploaded image) */
+  attachmentId?: string | null;
   at: number;
 }
 

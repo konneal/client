@@ -80,6 +80,10 @@ export interface Dataset {
 export interface Quota {
   used: number;
   limit: number;
+  /** the day's TOKEN budget (2026-09-29): the real allowance — used is
+   *  the post-charge state when the dedicated quota event carries it */
+  tokens_used?: number;
+  token_limit?: number;
 }
 
 export interface MemoryFile {

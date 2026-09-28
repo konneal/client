@@ -137,6 +137,8 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       else if (evt.type === "citations") {
         ev.onCitations?.(evt.citations ?? [], { sourceQuality: evt.source_quality ?? null, confidenceNote: evt.confidence_note ?? null });
         if (evt.quota) ev.onQuota?.(evt.quota);
+      } else if (evt.type === "quota") {
+        if (evt.quota) ev.onQuota?.(evt.quota);
       } else if (evt.type === "tool") {
         ev.onTool?.({ name: evt.name ?? "", query: evt.query ?? "" });
       } else if (evt.type === "confidence") {

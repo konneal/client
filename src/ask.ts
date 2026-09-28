@@ -13,6 +13,9 @@ export interface AskOptions {
   fresh?: boolean;
   /** data URL of a user-attached image (multimodal question context) */
   image?: string;
+  /** stored attachment ids (the member's own, via /api/attachments) —
+   *  Tier-2: the conversation's most recent image re-attaches server-side */
+  attachmentIds?: string[];
   /** dataset ids the user kept in scope (the sidebar toggles); the
    *  server intersects with session permissions */
   datasets?: string[];
@@ -74,6 +77,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
         stream: true,
         fresh: opts.fresh,
         image: opts.image,
+        ...(opts.attachmentIds?.length ? { attachment_ids: opts.attachmentIds } : {}),
         ...(opts.datasets ? { datasets: opts.datasets } : {}),
         ...(opts.effort && opts.effort !== "low" ? { effort: opts.effort } : {}),
         ...(opts.memories?.length ? { memories: opts.memories } : {}),

@@ -40,6 +40,9 @@ export interface Message {
   sourceQuality?: "verified" | "curated" | "ocr" | null;
   /** the answer's confidence statement (the engine's confidence_note) */
   confidenceNote?: string | null;
+  /** the entailment gate's measurement, when it landed (claim support in
+   *  the cited passages — TODO.new-era/10) */
+  entailment?: { support: string; score: number; ungrounded?: string[] } | null;
   at: number;
 }
 

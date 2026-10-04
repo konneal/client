@@ -43,6 +43,9 @@ export interface AskEvents {
   /** the agent's questioning rounds, streamed as they happen (the
    *  photograph read, the register search, any re-answer) */
   onAgent?: (step: string) => void;
+  /** the streamed answer is re-answering: clear the buffer — the tokens
+   *  that follow replace it */
+  onRetry?: () => void;
   onQuota?: (quota: Quota) => void;
   onToken?: (tok: string) => void;
   /** fires when the stream opens with the reading — before citations and tokens */
@@ -140,6 +143,8 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
       else if (evt.type === "citations") {
         ev.onCitations?.(evt.citations ?? [], { sourceQuality: evt.source_quality ?? null, confidenceNote: evt.confidence_note ?? null });
         if (evt.quota) ev.onQuota?.(evt.quota);
+      } else if (evt.type === "retry") {
+        ev.onRetry?.();
       } else if (evt.type === "agent") {
         if (evt.step) ev.onAgent?.(String(evt.step));
       } else if (evt.type === "quota") {

@@ -40,6 +40,9 @@ export interface AskEvents {
   onConfidence?: (measured: { sourceQuality: "verified" | "curated" | "ocr" | null; confidenceNote: string | null; entailment?: { support: string; score: number; ungrounded?: string[] } | null }) => void;
   /** the agent consulted a tool (name + the exact query string) */
   onTool?: (invocation: { name: string; query: string }) => void;
+  /** the agent's questioning rounds, streamed as they happen (the
+   *  photograph read, the register search, any re-answer) */
+  onAgent?: (step: string) => void;
   onQuota?: (quota: Quota) => void;
   onToken?: (tok: string) => void;
   /** fires when the stream opens with the reading — before citations and tokens */

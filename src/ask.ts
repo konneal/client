@@ -21,6 +21,9 @@ export interface AskOptions {
   datasets?: string[];
   /** memory file ids selected for this ask (member-scoped server-side) */
   memories?: string[];
+  /** the multi-turn agent loop (the server default is ON — set false
+   *  for the cheap single-pass) */
+  multi_turn?: boolean;
   signal?: AbortSignal;
 }
 
@@ -89,6 +92,7 @@ export async function askStreamed(query: string, opts: AskOptions, ev: AskEvents
         ...(opts.datasets ? { datasets: opts.datasets } : {}),
         ...(opts.effort && opts.effort !== "low" ? { effort: opts.effort } : {}),
         ...(opts.memories?.length ? { memories: opts.memories } : {}),
+        ...(opts.multi_turn !== undefined ? { multi_turn: opts.multi_turn } : {}),
       }),
       signal: opts.signal,
     });
